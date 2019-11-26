@@ -9,10 +9,16 @@
 using namespace std;
 using namespace testing;
 
-TEST(ActorGraphTests, HARD_TEST) {
+TEST(ActorGraphTests, SIMPLE_TEST) {
     ActorGraph graph;
     // Assert loading file works
-    ASSERT_EQ(graph.loadFromFile("../data/imdb_2019.tsv", true), true);
+    ASSERT_EQ(graph.loadFromFile("../data/imdb_small_sample.tsv", true), true);
+}
+
+TEST(ActorGraphTests, MEDIUM_TEST) {
+    ActorGraph graph;
+    // Assert loading file works
+    ASSERT_EQ(graph.loadFromFile("../data/imdb_middle_sample.tsv", false), true);
 }
 
 TEST(ActorGraphTests, INVALID_FILE_TEST) {
