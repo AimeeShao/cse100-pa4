@@ -16,13 +16,6 @@ TEST(ActorGraphTests, SIMPLE_TEST) {
     ASSERT_EQ(graph.loadFromFile("../data/imdb_small_sample.tsv", true), true);
 }
 
-TEST(ActorGraphTests, MEDIUM_TEST) {
-    ActorGraph graph;
-    // Assert loading file works
-    ASSERT_EQ(graph.loadFromFile("../data/imdb_middle_sample.tsv", false),
-              true);
-}
-
 TEST(ActorGraphTests, INVALID_FILE_TEST) {
     ActorGraph graph;
     // Assert loading invalid file returns false
@@ -31,8 +24,8 @@ TEST(ActorGraphTests, INVALID_FILE_TEST) {
 
 TEST(ActorGraphTests, PATHFIND_TEST) {
     ActorGraph graph;
-    graph.loadFromFile("../data/ucsdxy.txt", false);
-    const char* pairsFileName = "../data/ucsdpairs.txt";
+    graph.loadFromFile("../data/imdb_small_sample.tsv", false);
+    const char* pairsFileName = "../data/test_small_pairs.tsv";
     // Assert path finding works
     ASSERT_EQ(graph.pathFind(pairsFileName, cout), true);
 }
