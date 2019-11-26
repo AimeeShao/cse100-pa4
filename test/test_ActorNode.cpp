@@ -22,11 +22,11 @@ TEST(ActorNodeTests, SIMPLE_TEST) {
     movies.insert(&n);
 
     // Assert correct movies stored in movies
-    ASSERT_EQ(movies, tom.getMovies());
+    ASSERT_EQ(movies, tom.movies);
 }
 
 TEST(ActorNodeTests, SIMPLE_NAME_TEST) {
     ActorNode tom("Tom Johnson");
     // Assert name is correct
-    ASSERT_EQ("Tom Johnson", tom.getName());
+    ASSERT_EQ("Tom Johnson", tom.name);
 }

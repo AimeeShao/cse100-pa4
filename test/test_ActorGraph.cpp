@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -18,11 +19,20 @@ TEST(ActorGraphTests, SIMPLE_TEST) {
 TEST(ActorGraphTests, MEDIUM_TEST) {
     ActorGraph graph;
     // Assert loading file works
-    ASSERT_EQ(graph.loadFromFile("../data/imdb_middle_sample.tsv", false), true);
+    ASSERT_EQ(graph.loadFromFile("../data/imdb_middle_sample.tsv", false),
+              true);
 }
 
 TEST(ActorGraphTests, INVALID_FILE_TEST) {
     ActorGraph graph;
     // Assert loading invalid file returns false
     ASSERT_EQ(graph.loadFromFile("invalid.tsv", false), false);
+}
+
+TEST(ActorGraphTests, PATHFIND_TEST) {
+    ActorGraph graph;
+    graph.loadFromFile("../data/ucsdxy.txt", false);
+    const char* pairsFileName = "../data/ucsdpairs.txt";
+    // Assert path finding works
+    ASSERT_EQ(graph.pathFind(pairsFileName, cout), true);
 }

@@ -22,7 +22,7 @@ TEST(MovieEdgeTests, SIMPLE_TEST) {
     actors.insert(&alice);
 
     // Assert correct actors stored in movies
-    ASSERT_EQ(actors, oz.getActors());
+    ASSERT_EQ(actors, oz.actors);
 }
 
 TEST(MovieEdgeTests, SIMPLE_NAME_TEST) {
