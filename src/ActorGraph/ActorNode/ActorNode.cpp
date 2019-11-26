@@ -17,15 +17,3 @@ using namespace std;
  * @param movie Pointer to MovieEdge to add to movies vector
  */
 void ActorNode::addMovie(MovieEdge* movie) { movies.insert(movie); }
-
-/**
- * Method to output the name of the actor.
- * @return name of actor
- */
-string ActorNode::getName() { return name; }
-
-/**
- * Testing method to check movies vector.
- * @return unordered set of movies the actor is in
- */
-unordered_set<MovieEdge*> ActorNode::getMovies() { return movies; }

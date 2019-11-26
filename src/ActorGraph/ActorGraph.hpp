@@ -36,19 +36,28 @@ class ActorGraph {
      */
     ActorGraph(void);
 
-    // Maybe add some more methods here
+    /* Deconstructor.
+     * Deallocates the memory of the ActorNodes and MovieEdges in ActorGraph.
+     */
+    ~ActorGraph();
 
-    /** You can modify this method definition as you wish
-     *
+    /**
      * Load the graph from a tab-delimited file of actor->movie relationships.
-     *
-     * in_filename - input filename
-     * use_weighted_edges - if true, compute edge weights as 1 + (2019 -
+     * @param in_filename input filename
+     * @param use_weighted_edges if true, compute edge weights as 1 + (2019 -
      * movie_year), otherwise all edge weights will be 1
-     *
-     * return true if file was loaded sucessfully, false otherwise
+     * @return true if file was loaded sucessfully, false otherwise
      */
     bool loadFromFile(const char* in_filename, bool use_weighted_edges);
+
+    /**
+     * Read pairs file and output the expected output to the output file.
+     * @param pairs_filename Pairs filename
+     * @param out ostream of output file to output to
+     * @return true if path find was sucessful, false otherwise
+     */
+
+    bool pathFind(const char* pairs_filename, ostream& out);
 };
 
 #endif  // ACTORGRAPH_HPP

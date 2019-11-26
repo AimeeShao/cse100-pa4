@@ -36,9 +36,3 @@ bool MovieEdge::operator==(const MovieEdge& movie) {
  * @return string with name and year of movie.
  */
 string MovieEdge::getName() { return name + SPACING + to_string(year); }
-
-/**
- * Testing method to check actors vector.
- * @return unordered set of actors who have played in the movie.
- */
-unordered_set<ActorNode*> MovieEdge::getActors() { return actors; }

@@ -21,16 +21,23 @@ using namespace std;
  * and the movies the actor has worked in before.
  */
 class ActorNode {
-  protected:
+  public:
     string name;
     unordered_set<MovieEdge*> movies;
+    int dist;
+    pair<ActorNode*, MovieEdge*> prev;
+    bool done;
 
-  public:
     /**
      * Explicit Constuctor of the Actor Node.
      * @param actorName Actor's name
      */
-    ActorNode(string actorName) : name(actorName), movies(0) {}
+    ActorNode(string actorName) 
+    : name(actorName), 
+    movies(0), 
+    dist(0), 
+    prev(pair<ActorNode*, MovieEdge*>(nullptr, nullptr)), 
+    done(false) {}
 
     /**
      * Adds a movie into the movies vector to indicate a relationship between
@@ -38,18 +45,6 @@ class ActorNode {
      * @param movie Pointer to MovieEdge to add to movies vector
      */
     void addMovie(MovieEdge* movie);
-
-    /**
-     * Method to output the name of the actor.
-     * @return name of actor
-     */
-    string getName();
-
-    /**
-     * Testing method to check movies vector.
-     * @return vector of movies the actor is in
-     */
-    unordered_set<MovieEdge*> getMovies();
 };
 
 #endif  // ACTORNODE_HPP

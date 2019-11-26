@@ -21,13 +21,12 @@ using namespace std;
  * and the actors who worked in the movie.
  */
 class MovieEdge {
-  protected:
+  public:
     string name;
     int year;
     int weight;
     unordered_set<ActorNode*> actors;
 
-  public:
     /**
      * Explicit Constuctor of the MovieEdge.
      * @param movieName Name of the movie
@@ -57,12 +56,6 @@ class MovieEdge {
      * @return string with name and year of movie.
      */
     string getName();
-
-    /**
-     * Testing method to check actors vector.
-     * @return unordered set of actors who have played in the movie.
-     */
-    unordered_set<ActorNode*> getActors();
 };
 
 #endif  // MOVIEEDGE_HPP

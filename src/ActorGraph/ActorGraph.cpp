@@ -9,19 +9,43 @@
  */
 
 #include "ActorGraph.hpp"
+#include <limits.h>
 #include <fstream>
 #include <iostream>
+#include <queue>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #define CUR_YEAR 2019
+#define DOUBLE 2
+
+// string literals for outputting
+#define OPEN_P "("
+#define CLOSE_P ")"
+#define OPEN_S "["
+#define CLOSE_S "]"
+#define TO_MOVIE "--"
+#define TO_ACTOR "-->"
+
 using namespace std;
 
 /**
  * Constructor of the Actor graph
  */
 ActorGraph::ActorGraph(void) : numEdges(0), actors(0), movies(0) {}
+
+/**
+ * Deconstructor of the Actor graph. Deletes all the ActorNodes and MovieEdges
+ */
+ActorGraph::~ActorGraph() {
+    for (pair<string, ActorNode*> actor : actors) {
+        delete (actor.second);
+    }
+    for (pair<string, MovieEdge*> movie : movies) {
+        delete (movie.second);
+    }
+}
 
 /** You can modify this method definition as you wish
  *
@@ -111,6 +135,119 @@ bool ActorGraph::loadFromFile(const char* in_filename,
         return false;
     }
     infile.close();
+    return true;
+}
 
+/**
+ * Read pairs file and output the expected output to the output file.
+ * @param pairs_filename Pairs filename
+ * @param out ofstream of output file to output to
+ * @return true if path find was sucessful, false otherwise
+ */
+
+bool ActorGraph::pathFind(const char* pairs_filename, ostream& out) {
+    // Initialize the file stream
+    ifstream pairsfile(pairs_filename);
+
+    bool have_header = false;
+
+    // keep reading lines until the end of file is reached
+    while (pairsfile) {
+        string s;
+
+        // get the next line
+        if (!getline(pairsfile, s)) break;
+
+        if (!have_header) {
+            // skip the header
+            have_header = true;
+            continue;
+        }
+
+        istringstream ss(s);
+        vector<string> record;
+
+        while (ss) {
+            string str;
+
+            // get the next string before hitting a tab character and put it in
+            // 'str'
+            if (!getline(ss, str, '\t')) break;
+            record.push_back(str);
+        }
+
+        if (record.size() != DOUBLE) {
+            // we should have exactly 2 columns
+            continue;
+        }
+
+        string actorStart(record[0]);
+        string actorEnd(record[1]);
+
+        // check if these two actors exist. If not, then just empty line
+        if (actors.find(actorStart) == actors.end() ||
+            actors.find(actorEnd) == actors.end()) {
+            out << endl;
+            continue;
+        }
+
+        // Path finding
+        // set initial values for actors
+        for (pair<string, ActorNode*> actor : actors) {
+            actor.second->dist = INT_MAX;
+            actor.second->prev = pair<ActorNode*, MovieEdge*>(nullptr, nullptr);
+        }
+
+        // BFS Approach to path finding
+        queue<ActorNode*> toExplore;
+        ActorNode* start = actors[actorStart];
+        start->dist = 0;
+        toExplore.push(start);
+
+        while (!toExplore.empty()) {  // loop until all are visited
+            ActorNode* next = toExplore.front();
+            toExplore.pop();
+
+            if (next == actors[actorEnd]) {  // found end actor so stop looking
+                break;
+            }
+
+            for (MovieEdge* movie : next->movies) {       // loop movies
+                for (ActorNode* actor : movie->actors) {  // loop neighbors
+                    if (actor->dist == INT_MAX) {         // if not visited yet
+                        actor->dist = next->dist + 1;
+                        actor->prev = pair<ActorNode*, MovieEdge*>(next, movie);
+                        toExplore.push(actor);
+                    }
+                }
+            }
+        }
+
+        // traverse backwards from actorEnd to actorStart
+        vector<string> traversal;
+        traversal.push_back(actors[actorEnd]->name);
+        pair<ActorNode*, MovieEdge*> pair = actors[actorEnd]->prev;
+
+        // loop until we hit actorStart
+        while (pair.first != nullptr && pair.second != nullptr) {
+            traversal.push_back(pair.second->getName());
+            traversal.push_back(pair.first->name);
+            pair = pair.first->prev;
+        }
+
+        // traverse backwards in traversal and print out expected output
+        for (int i = traversal.size() - 1; i >= 0; i--) {
+            if (i % DOUBLE == 0) {  // actors
+                out << OPEN_P << traversal[i] << CLOSE_P;
+                if (i != 0) {  // not last actor
+                    out << TO_MOVIE;
+                }
+            } else {  // movie
+                out << OPEN_S << traversal[i] << CLOSE_S << TO_ACTOR;
+            }
+        }
+
+        out << endl;
+    }
     return true;
 }
