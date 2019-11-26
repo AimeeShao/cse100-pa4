@@ -6,6 +6,10 @@
         "cstddef": "cpp",
         "fstream": "cpp",
         "*.tcc": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp",
+        "string": "cpp",
+        "ostream": "cpp"
     }
 }
