@@ -19,6 +19,7 @@
 
 #define CUR_YEAR 2019
 #define DOUBLE 2
+#define TOP_LINKS 4
 
 // string literals for outputting
 #define OPEN_P "("
@@ -27,13 +28,14 @@
 #define CLOSE_S "]"
 #define TO_MOVIE "--"
 #define TO_ACTOR "-->"
+#define TAB "\t"
 
 using namespace std;
 
 /**
  * Constructor of the Actor graph
  */
-ActorGraph::ActorGraph(void) : numEdges(0), actors(0), movies(0) {}
+ActorGraph::ActorGraph(void) : actors(0), movies(0) {}
 
 /**
  * Deconstructor of the Actor graph. Deletes all the ActorNodes and MovieEdges
@@ -248,6 +250,148 @@ bool ActorGraph::pathFind(const char* pairs_filename, ostream& out) {
         }
 
         out << endl;
+    }
+    return true;
+}
+
+/**
+ * Predicts 4 top links for collaborated and non collaborated groups for each
+ * actor in the actorFile.
+ * @param actorsFileName File identifying actors to find top interactions for
+ * @param collabOut ostream to output collaborated group of interactions
+ * @param noncollabOut ostream to output non collaborated group links
+ * @return true if link predict find was sucessful, false otherwise
+ */
+bool ActorGraph::linkPredict(const char* actorsFileName, ostream& collabOut,
+                             ostream& noncollabOut) {
+    // Initialize the file stream
+    ifstream pairsfile(actorsFileName);
+
+    bool have_header = false;
+
+    // keep reading lines until the end of file is reached
+    while (pairsfile) {
+        string linkActor;
+
+        // get the next line
+        if (!getline(pairsfile, linkActor)) break;
+
+        if (!have_header) {
+            // skip the header
+            have_header = true;
+            continue;
+        }
+
+        // check if given actor exist. If not, then just empty line
+        if (actors.find(linkActor) == actors.end()) {
+            continue;
+        }
+
+        // Link Predictor
+        // collab group with their links count with linkActor
+        unordered_map<ActorNode*, int> collab;
+        unordered_map<ActorNode*, int> collabPriority;
+
+        // get collaborated group with their number of edges with linkActor
+        for (MovieEdge* movie : actors[linkActor]->movies) {
+            for (ActorNode* actor : movie->actors) {
+                if (actor->name != linkActor) {  // not the start actor
+                    // not linked yet
+                    if (collab.find(actor) == collab.end()) {
+                        collab[actor] = 1;
+                        collabPriority[actor] = 0;  // priorities are 0 for now
+                    } else {
+                        collab[actor] += 1;
+                    }
+                }
+            }
+        }
+
+        // get collab group's priority. Loop collab group as common neighbor
+        for (pair<ActorNode*, int> collabLinks : collab) {
+            // loop through movies in collab group
+            for (MovieEdge* movie : collabLinks.first->movies) {
+                // find third node for the triangle
+                for (ActorNode* actor : movie->actors) {
+                    if (actor != collabLinks.first &&
+                        collab.find(actor) != collab.end()) {
+                        // add priority by common neighbor's links w/ linkActor
+                        collabPriority[actor] += collabLinks.second;
+                    }
+                }
+            }
+        }
+
+        // pq of pair<priority, actor name> to find top 4 link
+        priority_queue<pair<int, string>, vector<pair<int, string>>,
+                       LinkPredComp>
+            pq;
+
+        // push all collabPriorities into pq
+        for (pair<ActorNode*, int> actor : collabPriority) {
+            pq.push(pair<int, string>(actor.second, actor.first->name));
+        }
+
+        // output collab group top links
+        for (int i = 0; i < TOP_LINKS; i++) {
+            if (pq.empty()) {
+                break;
+            }
+            collabOut << pq.top().second;
+            pq.pop();
+            if (i != TOP_LINKS - 1) {
+                collabOut << TAB;
+            }
+        }
+
+        // noncollab group with their links count with linkActor
+        unordered_map<ActorNode*, int> noncollabPriority;
+
+        // Get noncollab group & priorities. Use collab group as common neighbor
+        for (pair<ActorNode*, int> collabLinks : collab) {
+            // loop through movies in collab group
+            for (MovieEdge* movie : collabLinks.first->movies) {
+                // find second connections
+                for (ActorNode* actor : movie->actors) {
+                    // not linkActor and not in collab group
+                    if (actor->name != linkActor &&
+                        collab.find(actor) == collab.end()) {
+                        // initialize priority to 0
+                        if (noncollabPriority.find(actor) ==
+                            noncollabPriority.end()) {
+                            noncollabPriority[actor] = 0;
+                        }
+                        // add priority by common neighbor's links w/ linkActor
+                        noncollabPriority[actor] += collabLinks.second;
+                    }
+                }
+            }
+        }
+
+        // clear pq
+        pq = priority_queue<pair<int, string>, vector<pair<int, string>>,
+                            LinkPredComp>();
+
+        // push all noncollabPriorities into pq
+        for (pair<ActorNode*, int> actor : noncollabPriority) {
+            pq.push(pair<int, string>(actor.second, actor.first->name));
+        }
+
+        // output noncollab group top links
+        for (int i = 0; i < TOP_LINKS; i++) {
+            if (pq.empty()) {
+                break;
+            }
+            noncollabOut << pq.top().second;
+            pq.pop();
+            if (i != TOP_LINKS - 1) {
+                noncollabOut << TAB;
+            }
+        }
+
+        // Add new lines to both files
+        collabOut << endl;
+        noncollabOut << endl;
     }
     return true;
 }

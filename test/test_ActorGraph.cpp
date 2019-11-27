@@ -29,3 +29,11 @@ TEST(ActorGraphTests, PATHFIND_TEST) {
     // Assert path finding works
     ASSERT_EQ(graph.pathFind(pairsFileName, cout), true);
 }
+
+TEST(ActorGraphTests, LINKPREDICT_TEST) {
+    ActorGraph graph;
+    graph.loadFromFile("../data/imdb_small_sample.tsv", false);
+    const char* actorsFileName = "../data/test_actors.tsv";
+    // Assert linkpredictor works
+    ASSERT_EQ(graph.linkPredict(actorsFileName, cout, cout), true);
+}

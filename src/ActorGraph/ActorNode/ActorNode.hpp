@@ -26,18 +26,16 @@ class ActorNode {
     unordered_set<MovieEdge*> movies;
     int dist;
     pair<ActorNode*, MovieEdge*> prev;
-    bool done;
 
     /**
      * Explicit Constuctor of the Actor Node.
      * @param actorName Actor's name
      */
-    ActorNode(string actorName) 
-    : name(actorName), 
-    movies(0), 
-    dist(0), 
-    prev(pair<ActorNode*, MovieEdge*>(nullptr, nullptr)), 
-    done(false) {}
+    ActorNode(string actorName)
+        : name(actorName),
+          movies(0),
+          dist(0),
+          prev(pair<ActorNode*, MovieEdge*>(nullptr, nullptr)) {}
 
     /**
      * Adds a movie into the movies vector to indicate a relationship between

@@ -26,7 +26,6 @@ using namespace std;
  */
 class ActorGraph {
   protected:
-    int numEdges;
     unordered_map<string, ActorNode*> actors;
     unordered_map<string, MovieEdge*> movies;
 
@@ -56,8 +55,48 @@ class ActorGraph {
      * @param out ostream of output file to output to
      * @return true if path find was sucessful, false otherwise
      */
-
     bool pathFind(const char* pairs_filename, ostream& out);
+
+    /**
+     * Predicts 4 top links for collaborated and non collaborated groups for
+     * each actor in the actorFile.
+     * @param actorsFileName File identifying actors to find top interactions
+     * for
+     * @param collabOut ostream to output collaborated group of interactions
+     * @param noncollabOut ostream to output non collaborated group links
+     * @return true if link predict find was sucessful, false otherwise
+     */
+    bool linkPredict(const char* actorsFileName, ostream& collabOut,
+                     ostream& noncollabOut);
+};
+
+/* Comparator for linkpredictor. In priority queue, first compare counts, higher
+ * count has more priority. If tie, compare string, lower ascii has more
+ * priority.
+ */
+struct LinkPredComp {
+    /* The comparator or compare method for linkpredictor. First compare counts,
+     * higher count has more priority. If tie, compare string, lower ascii has
+     * more priority.
+     * @param lhs first pair to compare containing count and actor name
+     * @param rhs second pair to cmopare containing count and actor name
+     * @return True if lhs has lower priority than rhs
+     *         False if lhs has higher priority than rhs.
+     */
+    bool operator()(pair<int, string>& lhs, pair<int, string>& rhs) const {
+        // compare count
+        if (lhs.first < rhs.first) {  // rhs has higher priority
+            return true;
+        } else if (lhs.first > rhs.first) {  // lhs has higher priority
+            return false;
+        } else {  // counts are same, so compare ascii values
+            if (lhs.second > rhs.second) {  // lhs ascii high, so lower priority
+                return true;
+            } else {  // lhs has higher priority, rhs has lower priority
+                return false;
+            }
+        }
+    }
 };
 
 #endif  // ACTORGRAPH_HPP
