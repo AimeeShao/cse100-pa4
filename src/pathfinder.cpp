@@ -40,7 +40,7 @@ using namespace std;
  * @return 0 if succesful, Error if not.
  */
 int pathfind(const char* inFileName, const char* weight,
-              const char* pairsFileName, const char* outFileName) {
+             const char* pairsFileName, const char* outFileName) {
     bool use_weight;
     // format the weighted
     if (weight == (char*)UNWEIGHTED) {
@@ -76,13 +76,10 @@ int main(int argc, char* argv[]) {
     if (argc != NUM_ARGS) {
         exit(0);
     }
-    const char* inFileName = argv[INFILE_IDX];
-    const char* weight = argv[WEIGHT_IDX];
-    const char* pairsFileName = argv[PAIRSFILE_IDX];
-    const char* outFileName = argv[OUTFILE_IDX];
 
     // path find
-    pathfind(inFileName, weight, pairsFileName, outFileName);
+    pathfind(argv[INFILE_IDX], argv[WEIGHT_IDX], argv[PAIRSFILE_IDX],
+             argv[OUTFILE_IDX]);
 
     return 0;
 }
