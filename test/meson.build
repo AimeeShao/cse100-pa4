@@ -12,8 +12,3 @@ test_MovieEdge_exe = executable('test_MovieEdge.cpp.executable',
     sources: ['test_MovieEdge.cpp'], 
     dependencies : [actornode_dep, movieedge_dep, gtest_dep])
 test('my MovieEdge test', test_MovieEdge_exe)
-
-#test_pathfinder_exe = executable('test_pathfinder.cpp.executable', 
-#    sources: ['test_pathfinder.cpp'], 
-#    dependencies : [actorgraph_dep, actornode_dep, movieedge_dep, pathfinder_dep, gtest_dep])
-#test('my Pathfinder test', test_pathfinder_exe)
