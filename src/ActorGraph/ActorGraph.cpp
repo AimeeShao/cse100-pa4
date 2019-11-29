@@ -198,28 +198,47 @@ bool ActorGraph::pathFind(const char* pairs_filename, ostream& out) {
         for (pair<string, ActorNode*> actor : actors) {
             actor.second->dist = INT_MAX;
             actor.second->prev = pair<ActorNode*, MovieEdge*>(nullptr, nullptr);
+            actor.second->done = false;
+        }
+        for (pair<string, MovieEdge*> movie : movies) {
+            movie.second->done = false;
         }
 
-        // BFS Approach to path finding
-        queue<ActorNode*> toExplore;
+        // Dijkstra's Approach to path finding
+        priority_queue<pair<int, ActorNode*>, vector<pair<int, ActorNode*>>,
+                       greater<pair<int, ActorNode*>>>
+            toExplore;  // min heap based on weight
+
         ActorNode* start = actors[actorStart];
         start->dist = 0;
-        toExplore.push(start);
+        toExplore.push(pair<int, ActorNode*>(start->dist, start));
 
         while (!toExplore.empty()) {  // loop until all are visited
-            ActorNode* next = toExplore.front();
+            pair<int, ActorNode*> next = toExplore.top();
             toExplore.pop();
 
-            if (next == actors[actorEnd]) {  // found end actor so stop looking
+            if (next.second == actors[actorEnd]) {  // found end actor so stop
                 break;
             }
 
-            for (MovieEdge* movie : next->movies) {       // loop movies
-                for (ActorNode* actor : movie->actors) {  // loop neighbors
-                    if (actor->dist == INT_MAX) {         // if not visited yet
-                        actor->dist = next->dist + 1;
-                        actor->prev = pair<ActorNode*, MovieEdge*>(next, movie);
-                        toExplore.push(actor);
+            if (!next.second->done) {  // not done
+                next.second->done = true;
+                for (MovieEdge* movie : next.second->movies) {  // loop movies
+                    // if checked movie already, continue
+                    if (movie->done) {
+                        continue;
+                    }
+
+                    for (ActorNode* actor : movie->actors) {  // loop neighbors
+                        // find weight to get to this neighbor
+                        int weight = next.second->dist + movie->weight;
+                        if (weight < actor->dist) {  // less weight, add to pq
+                            actor->dist = weight;
+                            actor->prev = pair<ActorNode*, MovieEdge*>(
+                                next.second, movie);
+                            toExplore.push(
+                                pair<int, ActorNode*>(weight, actor));
+                        }
                     }
                 }
             }

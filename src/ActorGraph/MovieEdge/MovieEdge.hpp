@@ -25,6 +25,7 @@ class MovieEdge {
     string name;
     int year;
     int weight;
+    bool done;
     unordered_set<ActorNode*> actors;
 
     /**
@@ -34,7 +35,8 @@ class MovieEdge {
      * @param edgeWeight weight of this movie edge
      */
     MovieEdge(string movieName, int movieYear, int edgeWeight)
-        : name(movieName), year(movieYear), weight(edgeWeight), actors(0) {}
+        : name(movieName), year(movieYear), weight(edgeWeight), done(false), 
+        actors(0) {}
 
     /**
      * Adds an actor into the actors vector to indicate a relationship between

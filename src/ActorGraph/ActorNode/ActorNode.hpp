@@ -25,6 +25,7 @@ class ActorNode {
     string name;
     unordered_set<MovieEdge*> movies;
     int dist;
+    bool done;
     pair<ActorNode*, MovieEdge*> prev;
 
     /**
@@ -35,6 +36,7 @@ class ActorNode {
         : name(actorName),
           movies(0),
           dist(0),
+          done(false),
           prev(pair<ActorNode*, MovieEdge*>(nullptr, nullptr)) {}
 
     /**

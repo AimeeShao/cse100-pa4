@@ -43,9 +43,9 @@ int pathfind(const char* inFileName, const char* weight,
              const char* pairsFileName, const char* outFileName) {
     bool use_weight;
     // format the weighted
-    if (weight == (char*)UNWEIGHTED) {
+    if (string(weight) == UNWEIGHTED) {
         use_weight = false;
-    } else if (weight == (char*)WEIGHTED) {
+    } else if (string(weight) == WEIGHTED) {
         use_weight = true;
     }
 
