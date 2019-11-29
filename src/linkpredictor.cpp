@@ -56,7 +56,7 @@ int linkpredict(const char* inFileName, const char* actorsFileName,
 
     return 0;
 }
-/* Main program that runs the compress. Checks if input file is invalid or
+/* Main program that runs linkpredict. Checks if input file is invalid or
  * empty.
  * @param argc Number of arguments
  * @param argv Array of arguments

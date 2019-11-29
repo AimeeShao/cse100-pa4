@@ -65,7 +65,7 @@ int pathfind(const char* inFileName, const char* weight,
     return 0;
 }
 
-/* Main program that runs the compress. Checks if input file is invalid or
+/* Main program that runs pathfind. Checks if input file is invalid or
  * empty.
  * @param argc Number of arguments
  * @param argv Array of arguments
