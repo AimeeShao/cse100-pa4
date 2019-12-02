@@ -38,3 +38,10 @@ TEST(ActorGraphTests, LINKPREDICT_TEST) {
     // Assert linkpredictor works
     ASSERT_EQ(graph.linkPredict(actorsFileName, cout, cout), true);
 }
+
+TEST(ActorGraphTests, MOVIETRAVEL_TEST) {
+    ActorGraph graph;
+    graph.loadFromFile("../test/data/imdb_small_sample.tsv", true);
+    // Assert movietravel works
+    ASSERT_EQ(graph.movieTravel(cout), true);
+}

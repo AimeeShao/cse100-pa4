@@ -20,6 +20,7 @@
 #define CUR_YEAR 2019
 #define DOUBLE 2
 #define TOP_LINKS 4
+#define CONNECT_NUM 2
 
 // string literals for outputting
 #define OPEN_P "("
@@ -29,6 +30,12 @@
 #define TO_MOVIE "--"
 #define TO_ACTOR "-->"
 #define TAB "\t"
+
+// string literals for outputting movieTravel
+#define FROM_ACTOR "<--"
+#define NODES_CONNECTED "#NODE CONNECTED: "
+#define EDGES_CHOSEN "#EDGE CHOSEN: "
+#define TOTAL_WEIGHT "TOTAL EDGE WEIGHTS: "
 
 using namespace std;
 
@@ -412,5 +419,136 @@ bool ActorGraph::linkPredict(const char* actorsFileName, ostream& collabOut,
         collabOut << endl;
         noncollabOut << endl;
     }
+    return true;
+}
+
+/**
+ * Creates the minimum spanning tree (MST) for the graph and outputs its
+ * connections.
+ * @param out ostream to output MST to
+ * @return true if movie travel was sucessful, false otherwise
+ */
+bool ActorGraph::movieTravel(ostream& out) {
+    // min heap of weight and pointer to movie
+    priority_queue<pair<int, MovieEdge*>, vector<pair<int, MovieEdge*>>,
+                   greater<pair<int, MovieEdge*>>>
+        pq;
+
+    // map to store up tree of actors
+    unordered_map<ActorNode*, ActorNode*> map;
+
+    // used to keep track of when to stop connecting actors and final outputs
+    int connectedEdges = 0;
+    int edgeWeight = 0;
+
+    // add all movies to sort them by weight from smallest to largest
+    for (pair<string, MovieEdge*> pairing : movies) {
+        MovieEdge* movie = pairing.second;
+        pq.push(pair<int, MovieEdge*>(movie->weight, movie));
+    }
+
+    // place each actor in own subset
+    for (pair<string, ActorNode*> pairing : actors) {
+        map[pairing.second] = nullptr;
+    }
+
+    // until all actors are connected
+    while (!connectedActors(map)) {
+        while (!pq.empty()) {  // loop through movies in order by weight
+            MovieEdge* movie = pq.top().second;
+            pq.pop();
+
+            for (ActorNode* actorStart : movie->actors) {
+                for (ActorNode* actorEnd : movie->actors) {
+                    // same actor or in same set, cant combine the edge
+                    if (actorStart == actorEnd ||
+                        setFind(map, actorStart) == setFind(map, actorEnd)) {
+                        continue;
+                    }
+
+                    // connect actorStart and actorEnd sets
+                    setUnion(map, actorStart, actorEnd);
+
+                    // update required trackers
+                    connectedEdges++;
+                    edgeWeight += movie->weight;
+
+                    // output link edge
+                    out << OPEN_P << actorStart->name << CLOSE_P << FROM_ACTOR
+                        << OPEN_S << movie->name << CLOSE_S << TO_ACTOR
+                        << OPEN_P << actorEnd->name << CLOSE_P << endl;
+                }
+            }
+        }
+    }
+
+    // output final results
+    out << NODES_CONNECTED << actors.size() << endl;
+    out << EDGES_CHOSEN << connectedEdges << endl;
+    out << TOTAL_WEIGHT << edgeWeight << endl;
+
+    return true;
+}
+
+/**
+ * Finds the sentinal that an actor is a subset of. Used for movietravel.
+ * @param map Map of the up tree
+ * @param cur Pointer to actor to find the sentinal of.
+ * @return Pointer to the sentinal actor
+ */
+ActorNode* ActorGraph::setFind(unordered_map<ActorNode*, ActorNode*>& map,
+                               ActorNode* cur) {
+    vector<ActorNode*> path;  // used for path compression
+
+    while (map[cur] != nullptr) {  // loop until reach sentinal
+        path.push_back(cur);
+        cur = map[cur];
+    }
+
+    for (ActorNode* actor : path) {  // path compression
+        map[actor] = cur;
+    }
+
+    return cur;
+}
+
+/**
+ * Combines two sentinal sets. Used for movietravel.
+ * @param map Map of the up tree
+ * @param x Pointer to first actor to combine
+ * @param y Pointer to second actor to combine
+ * @return Pointer to the new sentinal actor
+ */
+ActorNode* ActorGraph::setUnion(unordered_map<ActorNode*, ActorNode*>& map,
+                                ActorNode* x, ActorNode* y) {
+    // find both sentinals of x and y
+    ActorNode* xSentinal = setFind(map, x);
+    ActorNode* ySentinal = setFind(map, y);
+
+    // combine them
+    map[xSentinal] = ySentinal;
+
+    return ySentinal;
+}
+
+/**
+ * Returns whether or not all actors are connected. Used for movietravel.
+ * @param map Map of the up tree
+ * @return True if all actors are connected. Otherwise, false.
+ */
+bool ActorGraph::connectedActors(unordered_map<ActorNode*, ActorNode*>& map) {
+    // first actor in actors map
+    ActorNode* firstActor = (*(actors.begin())).second;
+
+    // get sentinal of first actor. All other actors should have same sentinal
+    ActorNode* root = setFind(map, firstActor);
+
+    // loop through all actors to check if same sentinal
+    for (pair<string, ActorNode*> actor : actors) {
+        if (setFind(map, actor.second) != root) {  // not same, so not connected
+            return false;
+        }
+    }
+
     return true;
 }

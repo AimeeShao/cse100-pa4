@@ -68,16 +68,50 @@ class ActorGraph {
      */
     bool linkPredict(const char* actorsFileName, ostream& collabOut,
                      ostream& noncollabOut);
+
+    /**
+     * Creates the minimum spanning tree (MST) for the graph and outputs its
+     * connections.
+     * @param out ostream to output MST to
+     * @return true if movie travel was sucessful, false otherwise
+     */
+    bool movieTravel(ostream& out);
+
+    /**
+     * Finds the sentinal that an actor is a subset of. Used for movietravel.
+     * @param map Map of the up tree
+     * @param cur Pointer to actor to find the sentinal of.
+     * @return Pointer to the sentinal actor
+     */
+    ActorNode* setFind(unordered_map<ActorNode*, ActorNode*>& map,
+                       ActorNode* cur);
+
+    /**
+     * Combines two sentinal sets. Used for movietravel.
+     * @param map Map of the up tree
+     * @param x Pointer to first actor to combine
+     * @param y Pointer to second actor to combine
+     * @return Pointer to the new sentinal actor
+     */
+    ActorNode* setUnion(unordered_map<ActorNode*, ActorNode*>& map,
+                        ActorNode* x, ActorNode* y);
+
+    /**
+     * Returns whether or not all actors are connected. Used for movietravel.
+     * @param map Map of the up tree
+     * @return True if all actors are connected. Otherwise, false.
+     */
+    bool connectedActors(unordered_map<ActorNode*, ActorNode*>& map);
 };
 
-/* Comparator for linkpredictor. In priority queue, first compare counts, higher
- * count has more priority. If tie, compare string, lower ascii has more
- * priority.
+/* Comparator for linkpredictor. In priority queue, first compare counts,
+ * higher count has more priority. If tie, compare string, lower ascii has
+ * more priority.
  */
 struct LinkPredComp {
-    /* The comparator or compare method for linkpredictor. First compare counts,
-     * higher count has more priority. If tie, compare string, lower ascii has
-     * more priority.
+    /* The comparator or compare method for linkpredictor. First compare
+     * counts, higher count has more priority. If tie, compare string, lower
+     * ascii has more priority.
      * @param lhs first pair to compare containing count and actor name
      * @param rhs second pair to cmopare containing count and actor name
      * @return True if lhs has lower priority than rhs
