@@ -475,7 +475,7 @@ bool ActorGraph::movieTravel(ostream& out) {
 
                     // output link edge
                     out << OPEN_P << actorStart->name << CLOSE_P << FROM_ACTOR
-                        << OPEN_S << movie->name << CLOSE_S << TO_ACTOR
+                        << OPEN_S << movie->getName() << CLOSE_S << TO_ACTOR
                         << OPEN_P << actorEnd->name << CLOSE_P << endl;
                 }
             }
